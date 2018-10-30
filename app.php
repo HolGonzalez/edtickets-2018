@@ -20,7 +20,6 @@ function obtener_cupo ($actividad_id) {
 var_dump( obtener_cupo('1Y') );
 echo '</pre>'; */
 
-
 function obtener_horarios ($disciplina) {
   $sql = "SELECT * FROM actividades WHERE disciplina = ? ORDER BY actividad_id";
   $data = array($disciplina);
@@ -30,13 +29,34 @@ function obtener_horarios ($disciplina) {
   if ( count($result) === 0 ) {
     echo "No existen horarios para $disciplina";
   } else {
-    echo '<pre>';
+    /* echo '<pre>';
       var_dump($result);
-    echo '</pre>';
+    echo '</pre>'; */
+    $html = '';
+
+    foreach ($result as $row) {
+      $cupo = obtener_cupo($row['actividad_id']);
+      $lugares_disponibles = $cupo['cupo'] - $cupo['registrados'];
+
+      $html .= '
+        <p>
+          <label>
+            <input name="horario" type="radio" value="' . $row['actividad_id'] . '" required>
+            <span>' . $row['horario'] . '</span>
+            <span>' . $row['bloque'] . '</span>
+            <span>Quedan <b>' . $lugares_disponibles . '</b> lugares disponibles</span>
+          </label>
+        </p>
+      ';
+    }
+
+    echo $html;
   }
 }
 
 /* obtener_horarios('PILATES'); */
+
+if ( isset($_POST['disciplina']) )  obtener_horarios($_POST['disciplina']);
 
 function existe_registro ($email) {
   $sql = "SELECT p.email, p.nombre, p.apellidos, p.nacimiento,
