@@ -126,6 +126,16 @@ function crear_registro($nombre, $apellidos, $email, $nacimiento, $actividad) {
   echo json_encode($res);
 }
 
+if ( isset($_POST['email']) )
+  crear_registro(
+    $_POST['nombre'],
+    $_POST['apellidos'],
+    $_POST['email'],
+    $_POST['nacimiento'],
+    $_POST['horario']
+  );
+
+
 /* echo '<pre>';
 var_dump( crear_registro('Jona', 'MirCha', 'hola@jonmircha.com', '1984-05-23', '2P') );
 echo '</pre>'; */
@@ -145,7 +155,30 @@ function obtener_registros () {
   if (count($result) === 0) {
      return 'No existen registros';
   } else {
-    return $result;
+    //return $result;
+    $html = '';
+
+    foreach ( $result as $row ) {
+      $html .= '
+        <tr>
+          <td>' . $row['email'] . '</td>
+          <td>' . $row['nombre'] . '</td>
+          <td>' . $row['apellidos'] . '</td>
+          <td>' . $row['nacimiento'] . '</td>
+          <td>' . $row['bloque'] . '</td>
+          <td>' . $row['disciplina'] . '</td>
+          <td>' . $row['horario'] . '</td>
+          <td>' . $row['fecha'] . '</td>
+          <td>
+            <a href="#" class="btn-floating  lime">
+              <i class="material-icons  delete" data-registro="' . $row['email'] . '">delete</i>
+            </a>
+          </td>
+        </tr>
+      ';
+    }
+
+    return $html;
   }
 }
 
@@ -163,3 +196,5 @@ function eliminar_registro($email) {
 /* echo '<pre>';
 var_dump( eliminar_registro('hola@jonmircha.com') );
 echo '</pre>'; */
+
+if ( isset($_POST['registro']) )  eliminar_registro($_POST['registro']);

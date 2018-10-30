@@ -37,28 +37,97 @@
         method: 'post'
       })
         .then(res => {
-          c(res)
+          //c(res)
           return (res.ok)
             ? res.text()
             : Promise.reject({ status: res.status, statusText: res.statusText })
         })
         .then(res => {
-          c(res)
+          //c(res)
           horario.innerHTML = `<h5 class="grey-text  text-darken-2">ELIGE UN HORARIO</h5>${res}`
         })
         .catch(err => {
           let mensaje = mensaje_error(`Parece que hay un problema. Error ${err.status}: ${err.statusText}`)
-          c(mensaje)
+          //c(mensaje)
           horario.innerHTML = mensaje
         })
     }
   })
 
   d.addEventListener('submit', e => {
+    if (e.target.matches('form')) {
+      e.preventDefault()
+      alert('Registrando...')
 
+      let data = new FormData(e.target)
+
+      /* for (let key of data.keys()) {
+        c(key)
+      }
+
+      for (let value of data.values()) {
+        c(value)
+      } */
+
+      fetch('./app.php', {
+        body: data,
+        method: 'post'
+      })
+        .then(res => {
+          //c(res)
+          return (res.ok)
+            ? res.json()
+            : Promise.reject({ status: res.status, statusText: res.statusText })
+        })
+        .then(res => {
+          c(res)
+          let mensaje
+
+          if (res.err) {
+            mensaje = mensaje_error(res.msg)
+          } else {
+            mensaje = mensaje_ok(res.msg)
+            form.reset()
+          }
+
+          respuesta.innerHTML = mensaje
+        })
+        .catch(err => {
+          let mensaje = mensaje_error(`Parece que hay un problema. Error ${err.status}: ${err.statusText}`)
+          //c(mensaje)
+          respuesta.innerHTML = mensaje
+        })
+    }
   })
 
   d.addEventListener('click', e => {
+    if (e.target.matches('.delete')) {
+      e.preventDefault()
 
+      let seElimina = confirm(`¿Estás seguro de eliminar el registro del correo ${e.target.dataset.registro}?`)
+
+      if (seElimina) {
+        let data = new FormData()
+        data.append('registro', e.target.dataset.registro)
+
+        fetch('./app.php', {
+          body: data,
+          method: 'post'
+        })
+          .then(res => {
+            c(res.ok)
+            return (res.ok)
+              ? w.location.reload()
+              : Promise.reject({ status: res.status, statusText: res.statusText })
+          })
+          .catch(err => {
+            let mensaje = `Parece que hay un problema. Error ${err.status}: ${err.statusText}`
+            c(mensaje)
+            alert(mensaje)
+          })
+      } else {
+        return false
+      }
+    }
   })
 })(document, window, console.log, M);
